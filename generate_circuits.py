@@ -109,6 +109,8 @@ def invert_circuit_ubasis(gates: List[UGate]) -> QuantumCircuit:
 
 
 def identity_circuit(num_gates: int) -> List[str]:
+    if num_gates <= 1:
+        return ['u(0.0, 0.0, 0.0)']
     identity = []
     parameter_space = np.arange(0, (12 * np.pi) / 6, (np.pi / 6))
     identity_string = lambda theta, phi, lamb: f'u({theta},{phi},{lamb})'
