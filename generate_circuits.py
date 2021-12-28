@@ -103,14 +103,12 @@ def generate_gate(ind, bend, inc_fraction):
 
 def invert_circuit_ubasis(gates: List[UGate]) -> QuantumCircuit:
     combined_gates = Operator(gates[0])
-    for gate_idx in range(1, len(gates)):
-        combined_gates = combined_gates.compose(Operator(gates[gate_idx]))
-    return OneQubitEulerDecomposer(basis='U')(combined_gates.adjoint())
+    for i in range(1, len(gates)):
+        combined_gates = combined_gates.compose(Operator(gates[i]))
+    return OneQubitEulerDecomposer(basis='U')(combined_gates.adjoint(), simplify=False)
 
 
 def identity_circuit(num_gates: int) -> List[str]:
-    if num_gates <= 1:
-        return ['u(0.0, 0.0, 0.0)']
     identity = []
     parameter_space = np.arange(0, (12 * np.pi) / 6, (np.pi / 6))
     identity_string = lambda theta, phi, lamb: f'u({theta},{phi},{lamb})'
