@@ -1,7 +1,19 @@
 import numpy as np
 from enum import IntEnum
+
 from qiskit import QuantumCircuit
 from typing import List
+
+
+def mod_2pi(angle: float, atol: float = 0) -> float:
+    """
+    Wrap angle into interval [-π,π). If within atol of the endpoint, clamp to -π.
+    Source:
+       https://qiskit.org/documentation/locale/pt_BR/_modules/qiskit/quantum_info/synthesis/one_qubit_decompose.html"""
+    wrapped = (angle + np.pi) % (2 * np.pi) - np.pi
+    if abs(wrapped - np.pi) < atol:
+        wrapped = -np.pi
+    return wrapped
 
 
 class GateEnumerator(IntEnum):
@@ -18,7 +30,7 @@ def get_instruction_parameters(operation) -> List[float]:
     elif GateEnumerator[name] == GateEnumerator.x or GateEnumerator[name] == GateEnumerator.sx:
         return [1.0]
     else:
-        return operation.params
+        return [mod_2pi(param) for param in operation.params]
 
 
 def circuit_to_tensor(circuit: QuantumCircuit, max_depth: int = 140) -> np.ndarray:
