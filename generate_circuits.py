@@ -54,9 +54,9 @@ def rand_cx(n):
 
 
 def supremacy_circuit(bend=None, m=20, n=5):
-    sqrtx = 'u3(1.57079632679490,-1.57079632679490,1.57079632679490)'
-    sqrty = 'u3(1.57079632679490,0,0)'
-    sqrtw = 'u3(1.57079632679490,-0.785398163397448,0.785398163397449)'
+    sqrtx = 'u(1.57079632679490,-1.57079632679490,1.57079632679490)'
+    sqrty = 'u(1.57079632679490,0,0)'
+    sqrtw = 'u(1.57079632679490,-0.785398163397448,0.785398163397449)'
     gates = [sqrtx, sqrty, sqrtw]
 
     qasm_base = """OPENQASM 2.0;
@@ -95,7 +95,7 @@ def generate_gate(ind, bend, inc_fraction):
         i = ind // inc_fraction ** 2
         j = (ind // inc_fraction) % inc_fraction
         k = ind % inc_fraction
-        return 'u3(' + str(i / inc_fraction * np.pi) + ', ' + str(j / inc_fraction * np.pi) + ', ' + str(
+        return 'u(' + str(i / inc_fraction * np.pi) + ', ' + str(j / inc_fraction * np.pi) + ', ' + str(
             k / inc_fraction * np.pi) + ')'
     else:
         return None
@@ -154,7 +154,6 @@ creg c[1];
         elif last_gate.size() == 1:
             g = last_gate.qasm().split('\n')[-2][:-6]
         else:
-            inc_fraction += inc_fraction
             try_again = True
 
         identity.append(g)
@@ -274,8 +273,6 @@ def make_family(ind, backend, length=16, n=5, directory='./supremacy_all_5_uniqu
 
 
 if __name__ == '__main__':
-    IBMQFactory.save_account(
-        token='34db445bdd35a3a558ee27c8dbcd0f67ed2329079734cc57f4e73f9a41c7fd13e82eaa4eec8a8a7fe90d0562a79e995355580c78009ce3ac389bff5cd845e6e7')
     IBMQ.load_account()
     provider = IBMQ.get_provider(hub='ibm-q', group='open', project='main')
 
