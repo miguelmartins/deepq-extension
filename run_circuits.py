@@ -1,8 +1,9 @@
+import os
 import numpy as np
 from qiskit import *
 import time
-from qiskit.compiler import transpile
 from qiskit.providers.jobstatus import JobStatus
+from tqdm import tqdm
 
 IBMQ.load_account()
 provider = IBMQ.get_provider(group='open')
@@ -14,7 +15,7 @@ shots = 5000
 all_circuits = np.load('supremacy_all_5_unique/circuits.npy')
 
 circuits = []
-for i in range(1000):
+for i in tqdm(range(1000)):
     a = all_circuits[i]
     for j in range(len(a)):
         s = a[j]
@@ -32,6 +33,6 @@ for i in range(1000):
             for k, v in counts.items():
                 ones += v * k.count('1')
             f.append(ones/shots)
+        os.makedirs('supremacy_all_5_unique_noise/', exist_ok=True)
         np.save('supremacy_all_5_unique_noise/' + str(i).zfill(5) + '.npy', f)
-        print('completed', i)
         circuits = []
