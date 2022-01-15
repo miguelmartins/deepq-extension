@@ -2,7 +2,7 @@ import numpy as np
 from enum import IntEnum
 
 from qiskit import QuantumCircuit
-from typing import List
+from typing import List, Tuple
 
 
 def mod_2pi(angle: float, atol: float = 0) -> float:
@@ -93,3 +93,23 @@ def circuit_to_tensor_with_u_gates(circuit: QuantumCircuit, max_depth: int = 140
                            GateEnumerator[operation.name].value] = get_instruction_parameters(operation)
         depth[qubits] = depth[qubits] + 1
     return circuit_tensor
+
+
+def qasm_dataset_to_tensor_dataset(dataset: np.ndarray, circuit_dimensions: Tuple[int]) -> np.ndarray:
+    tensor_dataset = np.zeros(dataset.shape[:-1] + circuit_dimensions + (2,))
+    for family in range(dataset.shape[0]):
+        for circuit in range(dataset[family].shape[0]):
+            qc = QuantumCircuit.from_qasm_str(dataset[family, circuit, 0])
+            tensor_dataset[family, circuit, :, :, :, 0] = circuit_to_tensor_with_u_gates(qc)
+            tensor_dataset[family, circuit, :, :, :, 1] = dataset[family, circuit, 1]
+    return tensor_dataset
+
+
+def generate_pair_dataset(dataset: np.ndarray) -> np.ndarray:
+    pairs = np.zeros(dataset.shape[:2] + (2,) + dataset.shape[2:])
+    for family in range(dataset.shape[0]):
+        c0 = dataset[family, 0]
+        for c_i in range(dataset[family].shape[0]):
+            pairs[family, c_i, 0] = c0
+            pairs[family, c_i, 1] = dataset[family, c_i]
+    return pairs
