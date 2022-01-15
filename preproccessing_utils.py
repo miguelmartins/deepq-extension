@@ -96,13 +96,12 @@ def circuit_to_tensor_with_u_gates(circuit: QuantumCircuit, max_depth: int = 140
 
 
 def qasm_dataset_to_tensor_dataset(dataset: np.ndarray, circuit_dimensions: Tuple[int]) -> np.ndarray:
-    tensor_dataset = np.zeros(dataset.shape[:-1] + circuit_dimensions + (2,))
+    tensor_dataset = np.zeros(dataset.shape[:-1] + circuit_dimensions)
     for family in range(dataset.shape[0]):
         for circuit in range(dataset[family].shape[0]):
             qc = QuantumCircuit.from_qasm_str(dataset[family, circuit, 0])
-            tensor_dataset[family, circuit, :, :, :, 0] = circuit_to_tensor_with_u_gates(qc)
-            tensor_dataset[family, circuit, :, :, :, 1] = dataset[family, circuit, 1]
-    return tensor_dataset
+            tensor_dataset[family, circuit, :, :, :] = circuit_to_tensor_with_u_gates(qc)
+    return tensor_dataset, dataset[:, :, 1]
 
 
 def generate_pair_dataset(dataset: np.ndarray) -> np.ndarray:
