@@ -112,3 +112,18 @@ def generate_pair_dataset(dataset: np.ndarray) -> np.ndarray:
             pairs[family, c_i, 0] = c0
             pairs[family, c_i, 1] = dataset[family, c_i]
     return pairs
+
+
+def generate_concatenated_dataset(dataset: np.ndarray, target: np.ndarray) -> Tuple[np.ndarray]:
+    # TODO: investigate whether it is worth it to mirror the dataset, such that the model learns
+    # TODO: the relatioship = (error_i - error_j) = -(error_i - error_j)
+    concat_dataset = np.zeros(dataset.shape[:2] + (2 * dataset.shape[2],) + dataset.shape[3:])
+    target_diff = np.zeros(target.shape)
+    for family in range(dataset.shape[0]):
+        c0 = dataset[family, 0]
+        target_0 = target[family, 0]
+        for c_i in range(dataset[family].shape[0]):
+            concat_dataset[family, c_i, dataset.shape[2]:] = c0
+            concat_dataset[family, c_i, :dataset.shape[2]] = dataset[family, c_i]
+            target_diff[family, c_i] = target_0 - target[family, c_i]
+    return concat_dataset, target_diff
